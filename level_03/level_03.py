@@ -1,0 +1,53 @@
+#!/usr/bin/python
+import math
+
+"""
+--- Day 3: Perfectly Spherical Houses in a Vacuum ---
+
+Santa is delivering presents to an infinite two-dimensional grid of houses.
+
+He begins by delivering a present to the house at his starting location, and then an elf at the North Pole calls him via radio and tells him where to move next. Moves are always exactly one house to the north (^), south (v), east (>), or west (<). After each move, he delivers another present to the house at his new location.
+
+However, the elf back at the north pole has had a little too much eggnog, and so his directions are a little off, and Santa ends up visiting some houses more than once. How many houses receive at least one present?
+
+For example:
+
+    > delivers presents to 2 houses: one at the starting location, and one to the east.
+    ^>v< delivers presents to 4 houses in a square, including twice to the house at his starting/ending location.
+    ^v^v^v^v^v delivers a bunch of presents to some very lucky children at only 2 houses.
+"""
+
+f = open('in.txt', 'r')
+
+elf_instructions = f.readline()
+
+grid = dict()
+
+cur_x = 0
+cur_y = 0
+
+grid[(cur_x, cur_y)] = 1
+
+for instruction in elf_instructions:
+	if(not instruction.strip()): continue
+	if(instruction == '<'):
+		cur_x -= 1
+	elif(instruction == '>'):
+		cur_x += 1
+	elif(instruction == '^'):
+		cur_y -= 1
+	elif(instruction == 'v'):
+		cur_y += 1
+	
+	#print instruction
+	#print "x: %d, y: %d" % (cur_x, cur_y)
+	
+	if((cur_x, cur_y) in grid.keys()):
+		grid[(cur_x, cur_y)] += 1
+	else:
+		grid[(cur_x, cur_y)] = 1
+	
+	#print grid[(cur_x, cur_y)]
+
+#print grid
+print len(grid.keys())
