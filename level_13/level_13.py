@@ -1,5 +1,9 @@
 #!/usr/bin/python
 import re
+import itertools
+
+preferences = dict()
+table = list()
 
 f = open('in.txt', 'r')
 for line in f:
@@ -14,8 +18,31 @@ for line in f:
 	sign,happ = re.findall(r'(gain|lose) (\d+)', line)[0]
 	sign = 1 if(sign == 'gain') else -1
 	happ = sign * int(happ)
-	
+
 	if __debug__: print name, neighbour, happ
+	preferences[(name, neighbour)] = happ
+
+	if name not in table: table.append(name)
+
+if __debug__: print preferences
+
+if __debug__: print table
+
+totals = list()
+
+for perm in itertools.permutations(table):
+	if __debug__: print "Analyzing permutation ",  perm
+
+	happiness = 0
+	for idx in range(len(perm)):
+		idxp = len(perm) - 1 if (idx == 0) else idx-1
+		idxn = 0 if (idx == len(perm) - 1) else idx+1
+		if __debug__: print "%s <- %s -> %s" % (perm[idxp], perm[idx], perm[idxn])
+		happiness += preferences[(perm[idx], perm[idxp])] + preferences[(perm[idx], perm[idxn])]
+	if __debug__: print "Total happiness: ", happiness
+	totals.append(happiness)
+
+print "Max value is: ", max(totals)
 
 r"""
 --- Day 13: Knights of the Dinner Table ---
