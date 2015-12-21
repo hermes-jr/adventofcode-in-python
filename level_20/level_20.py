@@ -2,7 +2,6 @@
 import math
 
 targetnum = 33100000
-#targetnum = 990000
 
 """
 a bit smarter solution using sequence:
@@ -13,9 +12,7 @@ if n is squared(x) then divisors are symmetric therefore no need to calculate al
 example:
 8 = 8x1 or 1x8, 2x4 or 4x2
 """
-targetnum /= 10 # each elf brings 10. reduce
 done = False
-
 def get_divisors(number):
 	dlist = list()
 	root = math.sqrt(number)
@@ -23,8 +20,8 @@ def get_divisors(number):
 		dlist.append(root)
 		yield int(root)
 
-	for divisor in range(1, number):
-		if(divisor in dlist and divisor != 1):
+	for divisor in range(1, int(root) + 1):
+		if(divisor in dlist):
 			return # returning half way through
 		if(number % divisor == 0):
 			dlist.append(divisor) # divisor
@@ -32,35 +29,27 @@ def get_divisors(number):
 			yield divisor
 			yield number / divisor
 
-def sigma_1(num):
-	return sum(get_divisors(num))
-
 idx = 1
 while(not done):
-	sigma = sigma_1(idx)
+	divs = get_divisors(idx)
+
+	# part1:
+	#sigma = sum(divs)
+	#if __debug__: print "Trying house: %10d, sum of divisors is: %10d." % (idx, sigma)
+	#if (sigma * 10 >= targetnum):
+	#	solution = idx
+	#	done = True
+
+	# part 2:
+	sigma = sum(div for div in divs if idx / div <= 50)
 	if __debug__: print "Trying house: %10d, sum of divisors is: %10d." % (idx, sigma)
-	if (sigma_1(idx) >= targetnum):
+	if (sigma * 11 >= targetnum):
 		solution = idx
 		done = True
-	idx += 1
-print "Solution found:", solution
 
-r"""
-# brute force solution, insane time
-for house in range(1, targetnum):
-	gifts = 0
-	for elf in range(1, house+1):
-		elvnfits = (house % elf == 0)
-		if(elvnfits):
-			if __debug__: print "elf %d fits for house %d" % (elf, house)
-			gifts += 10 * elf
-	if __debug__: print "In house %d there are %d gifts." % (house, gifts)
-	if(gifts >= targetnum):
-		print "Solution found, house number is %d, gifts number is: %d" % (house, gifts)
-		quit()
-		break
-print "No solution found", quit()
-"""
+	idx += 1
+
+print "Solution found:", solution
 
 r"""
 --- Day 20: Infinite Elves and Infinite Houses ---
@@ -90,4 +79,10 @@ House 9 got 130 presents.
 The first house gets 10 presents: it is visited only by Elf 1, which delivers 1 * 10 = 10 presents. The fourth house gets 70 presents, because it is visited by Elves 1, 2, and 4, for a total of 10 + 20 + 40 = 70 presents.
 
 What is the lowest house number of the house to get at least as many presents as the number in your puzzle input?
+
+--- Part Two ---
+
+The Elves decide they don't want to visit an infinite number of houses. Instead, each Elf will stop after delivering presents to 50 houses. To make up for it, they decide to deliver presents equal to eleven times their number at each house.
+
+With these changes, what is the new lowest house number of the house to get at least as many presents as the number in your puzzle input?
 """
