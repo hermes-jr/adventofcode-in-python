@@ -1,11 +1,17 @@
 #!/usr/bin/python
+import re
+
+ingreds = {}
 
 f = open('in.txt', 'r')
 for line in f:
 	line = line.strip()
 	if(not line): continue
 
-	if __debug__: print line
+	if __debug__: print(line)
+	ingreds[line.split(':')[0]] = {k: v for (k, v) in re.findall(r'([a-z]+) (-?\d+)', line)}
+
+if __debug__: print('Ingredients parsed: {0}'.format(ingreds))
 
 r"""
 --- Day 15: Science for Hungry People ---
