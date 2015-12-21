@@ -2,6 +2,7 @@
 import math
 
 targetnum = 33100000
+#targetnum = 900000
 
 """
 a bit smarter solution using sequence:
@@ -11,41 +12,46 @@ A000203 a(n) = sigma(n), the sum of the divisors of n. Also called sigma_1(n).
 if n is squared(x) then divisors are symmetric therefore no need to calculate all of them, only half
 example:
 8 = 8x1 or 1x8, 2x4 or 4x2
+
+possible speedup: sum(n) = n + sum(biggest divisor). saving of known sums required
+
+for primes sum = n+1
 """
 done = False
 def get_divisors(number):
-	dlist = list()
-	root = math.sqrt(number)
+	root = int(math.sqrt(number))
+	dlist = [root + 1]
 	if(math.modf(root)[0] == 0.0):
 		dlist.append(root)
 		yield int(root)
 
-	for divisor in range(1, int(root) + 1):
+	for divisor in range(1, root + 1):
 		if(divisor in dlist):
 			return # returning half way through
 		if(number % divisor == 0):
 			dlist.append(divisor) # divisor
-			dlist.append(number / divisor) # remember complementary
+			res = number / divisor
+			dlist.append(res) # remember complementary
 			yield divisor
-			yield number / divisor
+			yield res
 
 idx = 1
 while(not done):
 	divs = get_divisors(idx)
 
 	# part1:
-	#sigma = sum(divs)
-	#if __debug__: print "Trying house: %10d, sum of divisors is: %10d." % (idx, sigma)
-	#if (sigma * 10 >= targetnum):
-	#	solution = idx
-	#	done = True
-
-	# part 2:
-	sigma = sum(div for div in divs if idx / div <= 50)
+	sigma = sum(divs)
 	if __debug__: print "Trying house: %10d, sum of divisors is: %10d." % (idx, sigma)
-	if (sigma * 11 >= targetnum):
+	if (sigma * 10 >= targetnum):
 		solution = idx
 		done = True
+
+	# part 2:
+	#sigma = sum(div for div in divs if idx / div <= 50)
+	#if __debug__: print "Trying house: %10d, sum of divisors is: %10d." % (idx, sigma)
+	#if (sigma * 11 >= targetnum):
+	#	solution = idx
+	#	done = True
 
 	idx += 1
 
