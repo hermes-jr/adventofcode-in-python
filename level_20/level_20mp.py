@@ -2,9 +2,15 @@
 import math
 import multiprocessing
 from multiprocessing import Process, Value, Array
+"""
+Fucking insane method of solution here.
+Do not read it, do not use it.
+This code is an abomination!
+I'm ashamed.
+"""
 
-targetnum = 33100000
-#targetnum =  10000
+#targetnum = 33100000
+targetnum = 900000
 
 """
 a bit smarter solution using sequence:
@@ -17,7 +23,6 @@ example:
 
 for prime n sum=n+1
 """
-targetnum /= 10 # each elf brings 10. reduce
 done = False
 
 def genprimes(n):
@@ -29,7 +34,7 @@ def genprimes(n):
 			sieve[i*i::2*i]=[False]*((n-i*i-1)/(2*i)+1)
 	return [2] + [i for i in xrange(3,n,2) if sieve[i]]
 
-primes = tuple(genprimes(targetnum+1))
+primes = tuple(genprimes(targetnum))
 
 def get_divisors(number):
 	dlist = list()
@@ -39,7 +44,7 @@ def get_divisors(number):
 		yield int(root)
 
 	for divisor in range(1, number):
-		if(divisor in dlist and divisor != 1):
+		if(divisor in dlist):
 			return # returning half way through
 		if(number % divisor == 0):
 			dlist.append(divisor) # divisor
@@ -54,7 +59,6 @@ def sigma_1(num):
 	return sum(get_divisors(num))
 
 nthreads = multiprocessing.cpu_count() # +1?
-#batch = int(math.ceil(targetnum / nthreads)) # not a bad idea until targetnum is too big, since it's hard to kill other threads
 batch = 200
 
 def worker(myid, startidx, mpdone, aresult):
@@ -63,7 +67,7 @@ def worker(myid, startidx, mpdone, aresult):
 	for idx in range(startidx, startidx + batch - 1):
 		sigma = sigma_1(idx)
 		if __debug__: print "[thread %d] Trying house: %10d, sum of divisors is: %10d." % (myid, idx, sigma)
-		if (sigma_1(idx) >= targetnum):
+		if (sigma_1(idx) * 10 >= targetnum):
 			aresult[myid] = idx
 			mpdone.value = 1
 			return
