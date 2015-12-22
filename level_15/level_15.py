@@ -3,8 +3,10 @@ import re
 import numpy as np
 
 RECIPE_SIZE = 100
+MAXCALORIES = 500
 ingreds = {}
-scores = []
+scores1 = []
+scores2 = []
 
 def score(recipe, index):
 	cap, dur, fla, tex, cal = 0
@@ -29,7 +31,7 @@ if __debug__: print('Ingredients parsed: {0}'.format(ingreds))
 #recipes = [row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE] # seems a bit faster
 for recipe in (row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE):
 	if __debug__: print(recipe)
-	props = {'cap': 0, 'dur': 0, 'fla': 0, 'tex': 0}
+	props = {'cap': 0, 'dur': 0, 'fla': 0, 'tex': 0, 'cal': 0}
 	for idx, amt in enumerate(recipe):
 		ingred = ingreds[ingreds.keys()[idx]]
 		if __debug__: print ('Amount of {0} is: {1}. props: {2}'.format(ingreds.keys()[idx], amt, ingred))
@@ -37,11 +39,16 @@ for recipe in (row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if 
 		props['dur'] += ingred['durability'] * amt
 		props['fla'] += ingred['flavor'] * amt
 		props['tex'] += ingred['texture'] * amt
+		props['cal'] += ingred['calories'] * amt
 
 	props = {k: max(0, v) for k, v in props.items()}
-	scores.append(np.prod(props.values()))
+	if(props['cal'] == MAXCALORIES):
+		scores2.append(np.prod( {k: v for k, v in props.items() if k != 'cal'}.values() ))
+	else:
+		scores1.append(np.prod( {k: v for k, v in props.items() if k != 'cal'}.values() ))
 
-print("Answer: {0}".format(max(scores)))
+print("Part 1 answer: {0}".format(max(scores1)))
+print("Part 2 answer: {0}".format(max(scores2)))
 
 r"""
 --- Day 15: Science for Hungry People ---
@@ -73,4 +80,12 @@ Then, choosing to use 44 teaspoons of butterscotch and 56 teaspoons of cinnamon 
 Multiplying these together (68 * 80 * 152 * 76, ignoring calories for now) results in a total score of 62842880, which happens to be the best score possible given these ingredients. If any properties had produced a negative total, it would have instead become zero, causing the whole score to multiply to zero.
 
 Given the ingredients in your kitchen and their properties, what is the total score of the highest-scoring cookie you can make?
+
+--- Part Two ---
+
+Your cookie recipe becomes wildly popular! Someone asks if you can make another recipe that has exactly 500 calories per cookie (so they can use it as a meal replacement). Keep the rest of your award-winning process the same (100 teaspoons, same ingredients, same scoring system).
+
+For example, given the ingredients above, if you had instead selected 40 teaspoons of butterscotch and 60 teaspoons of cinnamon (which still adds to 100), the total calorie count would be 40*8 + 60*3 = 500. The total score would go down, though: only 57600000, the best you can do in such trying circumstances.
+
+Given the ingredients in your kitchen and their properties, what is the total score of the highest-scoring cookie you can make with a calorie total of 500?
 """
