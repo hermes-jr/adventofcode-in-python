@@ -1,17 +1,36 @@
 #!/usr/bin/python
 import re
+import numpy as np
 
+RECIPE_SIZE = 100
 ingreds = {}
 
-f = open('in.txt', 'r')
-for line in f:
-	line = line.strip()
-	if(not line): continue
+def score(recipe, index):
+	cap, dur, fla, tex, cal = 0
+	for k,v in recipe.items():
+		cap += v['cap']['i']
 
-	if __debug__: print(line)
-	ingreds[line.split(':')[0]] = {k: v for (k, v) in re.findall(r'([a-z]+) (-?\d+)', line)}
+with open('in.txt', 'r') as f:
+	for line in f:
+		line = line.strip()
+		if(not line): continue
+
+		if __debug__: print(line)
+		ingreds[line.split(':')[0]] = {k: v for (k, v) in re.findall(r'([a-z]+) (-?\d+)', line)}
 
 if __debug__: print('Ingredients parsed: {0}'.format(ingreds))
+
+""" each recipe must contain exactly RECIPE_SIZE (100) spoons of ingredients total """
+""" number of input ingredients is variable """
+""" not the best solution, slow as hell, but it covers such options as: """
+""" recipe has a missing ingredient, or there's only one ingredient. example: [50, 0, 0, 50] or [0, 0, 100, 0] """
+#recipes = filter(lambda x: sum(x) == RECIPE_SIZE, np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)))
+#recipes = [row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE] # seems a bit faster
+for recipe in (row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE):
+	if __debug__: print(recipe)
+	for idx, amt in enumerate(recipe):
+		if __debug__: print ('Amount of {0} is: {1}'.format(ingreds.keys()[idx], amt))
+
 
 r"""
 --- Day 15: Science for Hungry People ---
