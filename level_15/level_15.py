@@ -4,6 +4,7 @@ import numpy as np
 
 RECIPE_SIZE = 100
 ingreds = {}
+scores = []
 
 def score(recipe, index):
 	cap, dur, fla, tex, cal = 0
@@ -16,7 +17,7 @@ with open('in.txt', 'r') as f:
 		if(not line): continue
 
 		if __debug__: print(line)
-		ingreds[line.split(':')[0]] = {k: v for (k, v) in re.findall(r'([a-z]+) (-?\d+)', line)}
+		ingreds[line.split(':')[0]] = {k: int(v) for (k, v) in re.findall(r'([a-z]+) (-?\d+)', line)}
 
 if __debug__: print('Ingredients parsed: {0}'.format(ingreds))
 
@@ -28,9 +29,19 @@ if __debug__: print('Ingredients parsed: {0}'.format(ingreds))
 #recipes = [row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE] # seems a bit faster
 for recipe in (row for row in np.ndindex((RECIPE_SIZE + 1, ) * len(ingreds)) if sum(row) == RECIPE_SIZE):
 	if __debug__: print(recipe)
+	props = {'cap': 0, 'dur': 0, 'fla': 0, 'tex': 0}
 	for idx, amt in enumerate(recipe):
-		if __debug__: print ('Amount of {0} is: {1}'.format(ingreds.keys()[idx], amt))
+		ingred = ingreds[ingreds.keys()[idx]]
+		if __debug__: print ('Amount of {0} is: {1}. props: {2}'.format(ingreds.keys()[idx], amt, ingred))
+		props['cap'] += ingred['capacity'] * amt
+		props['dur'] += ingred['durability'] * amt
+		props['fla'] += ingred['flavor'] * amt
+		props['tex'] += ingred['texture'] * amt
 
+	props = {k: max(0, v) for k, v in props.items()}
+	scores.append(np.prod(props.values()))
+
+print("Answer: {0}".format(max(scores)))
 
 r"""
 --- Day 15: Science for Hungry People ---
