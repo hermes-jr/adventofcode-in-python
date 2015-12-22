@@ -8,11 +8,6 @@ ingreds = {}
 scores1 = []
 scores2 = []
 
-def score(recipe, index):
-	cap, dur, fla, tex, cal = 0
-	for k,v in recipe.items():
-		cap += v['cap']['i']
-
 with open('in.txt', 'r') as f:
 	for line in f:
 		line = line.strip()
