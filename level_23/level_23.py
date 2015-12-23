@@ -69,7 +69,7 @@ def runprog():
 
 runprog()
 
-regs.a = 1 # part 
+regs.a = 1 # part 2
 
 runprog()
 
