@@ -1,4 +1,5 @@
 #!/usr/bin/python
+""" run as `python -O level_23.py` to disable debug garbage """
 import ctypes
 import re
 
@@ -7,10 +8,10 @@ class ureg(object):
 	a, b = 0, 0
 	def __setattr__(self, attr, val):
 		self.__dict__[attr] = ctypes.c_uint32(val).value
+""" turned out to be a surplus code :) """
 
 regs = ureg()
 prog = []
-cir, eip = 0, 0
 
 with open('in.txt', 'r') as f:
 	for line in f:
@@ -22,49 +23,58 @@ with open('in.txt', 'r') as f:
 def dumpregs():
 	print("Registers: a: {0: <10d} b: {1:<10d}".format(regs.a, regs.b))
 
-print("Running...")
-done = False
-while(not done):
-	cir = eip
-	eip += 1
+def runprog():
+	cir, eip = 0, 0
+	print("Running...")
+	done = False
+	while(not done):
+		cir = eip
+		eip += 1
 
-	if(cir >= len(prog)):
-		print("Done. Out of instructions")
-		dumpregs()
-		done = True
-		break
+		if(cir >= len(prog)):
+			print("Done. Out of instructions")
+			dumpregs()
+			done = True
+			break
 
-	act = prog[cir]
-	if __debug__:
-		print("[{0:4d}]: {1:30s}".format(cir, act)),
-		dumpregs()
+		act = prog[cir]
+		if __debug__:
+			print("[{0:4d}]: {1:30s}".format(cir, act)),
+			dumpregs()
 
-	if(act.split()[0] == 'inc'):
-		setattr(regs, act.split()[1], getattr(regs, act.split()[1]) + 1)
-		continue
-	elif(act.split()[0] == 'tpl'):
-		setattr(regs, act.split()[1], getattr(regs, act.split()[1]) * 3)
-		continue
-	elif(act.split()[0] == 'hlf'):
-		setattr(regs, act.split()[1], int(getattr(regs, act.split()[1]) / 2) )
-		continue
-	elif(act.split()[0] == 'jmp'):
-		eip = cir + int(act.split()[1])
-		continue
-	elif(act.split()[0] == 'jio'):
-		parts = re.split(' |,', act)
-		comp = parts[1]
-		trg = int(parts[3])
-		if(getattr(regs, comp) == 1):
-			eip += trg - 1
-		continue
-	elif(act.split()[0] == 'jie'):
-		parts = re.split(' |,', act)
-		comp = parts[1]
-		trg = int(parts[3])
-		if(getattr(regs, comp) % 2 == 0):
-			eip += trg - 1
-		continue
+		if(act.split()[0] == 'inc'):
+			setattr(regs, act.split()[1], getattr(regs, act.split()[1]) + 1)
+			continue
+		elif(act.split()[0] == 'tpl'):
+			setattr(regs, act.split()[1], getattr(regs, act.split()[1]) * 3)
+			continue
+		elif(act.split()[0] == 'hlf'):
+			setattr(regs, act.split()[1], int(getattr(regs, act.split()[1]) / 2) )
+			continue
+		elif(act.split()[0] == 'jmp'):
+			eip = cir + int(act.split()[1])
+			continue
+		elif(act.split()[0] == 'jio'):
+			parts = re.split(' |,', act)
+			comp = parts[1]
+			trg = int(parts[3])
+			if(getattr(regs, comp) == 1):
+				eip += trg - 1
+			continue
+		elif(act.split()[0] == 'jie'):
+			parts = re.split(' |,', act)
+			comp = parts[1]
+			trg = int(parts[3])
+			if(getattr(regs, comp) % 2 == 0):
+				eip += trg - 1
+			continue
+
+runprog()
+
+regs.a = 1
+regs.b = 0
+
+runprog()
 
 r"""
 --- Day 23: Opening the Turing Lock ---
@@ -92,4 +102,8 @@ tpl a
 inc a
 
 What is the value in register b when the program in your puzzle input is finished executing?
+
+--- Part Two ---
+
+The unknown benefactor is very thankful for releasi-- er, helping little Jane Marie with her computer. Definitely not to distract you, what is the value in register b after the program is finished executing if register a starts as 1 instead?
 """
