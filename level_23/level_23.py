@@ -5,7 +5,7 @@ import re
 
 """ since Python has no unsigned int builtin: """
 class ureg(object):
-	a, b = 0, 0
+	a = b = 0
 	def __setattr__(self, attr, val):
 		self.__dict__[attr] = ctypes.c_uint32(val).value
 """ turned out to be a surplus code :) """
@@ -24,7 +24,7 @@ def dumpregs():
 	print("Registers: a: {0: <10d} b: {1:<10d}".format(regs.a, regs.b))
 
 def runprog():
-	cir, eip = 0, 0
+	cir = eip = 0
 	print("Running...")
 	done = False
 	while(not done):
@@ -35,6 +35,7 @@ def runprog():
 			print("Done. Out of instructions")
 			dumpregs()
 			done = True
+			regs.a = regs.b = 0
 			break
 
 		act = prog[cir]
@@ -42,37 +43,33 @@ def runprog():
 			print("[{0:4d}]: {1:30s}".format(cir, act)),
 			dumpregs()
 
+		rgname = act.split()[1]
 		if(act.split()[0] == 'inc'):
-			setattr(regs, act.split()[1], getattr(regs, act.split()[1]) + 1)
+			setattr(regs, rgname, getattr(regs, rgname) + 1)
 			continue
 		elif(act.split()[0] == 'tpl'):
-			setattr(regs, act.split()[1], getattr(regs, act.split()[1]) * 3)
+			setattr(regs, rgname, getattr(regs, rgname) * 3)
 			continue
 		elif(act.split()[0] == 'hlf'):
-			setattr(regs, act.split()[1], int(getattr(regs, act.split()[1]) / 2) )
+			setattr(regs, rgname, int(getattr(regs, rgname) / 2) )
 			continue
 		elif(act.split()[0] == 'jmp'):
-			eip = cir + int(act.split()[1])
+			eip = cir + int(rgname)
 			continue
 		elif(act.split()[0] == 'jio'):
-			parts = re.split(' |,', act)
-			comp = parts[1]
-			trg = int(parts[3])
+			parts, comp, _, trg  = re.split(' |,', act)
 			if(getattr(regs, comp) == 1):
-				eip += trg - 1
+				eip = cir + int(trg)
 			continue
 		elif(act.split()[0] == 'jie'):
-			parts = re.split(' |,', act)
-			comp = parts[1]
-			trg = int(parts[3])
+			parts, comp, _, trg  = re.split(' |,', act)
 			if(getattr(regs, comp) % 2 == 0):
-				eip += trg - 1
+				eip = cir + int(trg)
 			continue
 
 runprog()
 
-regs.a = 1
-regs.b = 0
+regs.a = 1 # part 
 
 runprog()
 
