@@ -61,6 +61,7 @@ rngs.extend(list(itertools.combinations(SHOP['rings'], 1)))
 rngs.append(NTHN)
 
 minprice = -1
+bigloss = 0
 for option in itertools.product(wpns, rngs, armrs):
 	price = 0
 	challenger = HERO.copy()
@@ -79,8 +80,12 @@ for option in itertools.product(wpns, rngs, armrs):
 	if(victory and (price < minprice or minprice == -1)):
 		minprice = price
 		if __debug__: print("Minprice updated {}".format(minprice))
+	elif(not victory and bigloss < price):
+		bigloss = price
+		if __debug__: print("Bigloss updated {}".format(bigloss))
 
 print("Result: {} gold is the minimum price of victory".format(minprice))
+print("Result2: {} gold is the maximum price of failure".format(bigloss))
 
 r"""
 --- Day 21: RPG Simulator 20XX ---
@@ -132,4 +137,10 @@ For example, suppose you have 8 hit points, 5 damage, and 5 armor, and that the 
 In this scenario, the player wins! (Barely.)
 
 You have 100 hit points. The boss's actual stats are in your puzzle input. What is the least amount of gold you can spend and still win the fight?
+
+--- Part Two ---
+
+Turns out the shopkeeper is working with the boss, and can persuade you to buy whatever items he wants. The other rules still apply, and he still only has one of each item.
+
+What is the most amount of gold you can spend and still lose the fight?
 """
