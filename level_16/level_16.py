@@ -5,6 +5,7 @@ aunts = {}
 TARGETPROPS = {'children': 3, 'cats': 7, 'samoyeds': 2, 'pomeranians': 3, 'akitas': 0,
 			'vizslas': 0, 'goldfish': 5, 'trees': 3, 'cars': 2, 'perfumes': 1}
 result1 = -1
+result2 = -1
 
 with open('in.txt', 'r') as f:
 	for line in f:
@@ -25,7 +26,8 @@ if __debug__: print("\n".join("{}: {}".format(k, v) for k, v in aunts.items()))
 for k, v in aunts.items():
 	allkeys = True
 	for key in TARGETPROPS.keys():
-		if(v[key] != -1 and TARGETPROPS[key] != v[key]):
+		if(v[key] == -1): continue
+		if(TARGETPROPS[key] != v[key]):
 			if __debug__: print("Aunt {}: no match".format(k))
 			allkeys = False
 			break
@@ -33,7 +35,30 @@ for k, v in aunts.items():
 		if __debug__: print("Aunt {}: MATCH FOUND!".format(k))
 		result1 = k
 
+""" this is bullshit. lack of sleep """
+""" gives a correct result however """
+for k, v in aunts.items():
+	allkeys = True
+	for key in TARGETPROPS.keys():
+		if(v[key] == -1): continue
+		if((key in ('cats', 'trees')) and TARGETPROPS[key] >= v[key]):
+			allkeys = False
+			if __debug__: print("Aunt {}: no match, cats and trees".format(k))
+			break
+		elif((key in ('pomeranians', 'goldfish')) and TARGETPROPS[key] <= v[key]):
+			allkeys = False
+			if __debug__: print("Aunt {}: no match, fish and pompom".format(k))
+			break
+		elif(key not in ('pomeranians', 'goldfish', 'cats', 'trees') and TARGETPROPS[key] != v[key]):
+			allkeys = False
+			if __debug__: print("Aunt {}: no match, known data {}".format(k, key))
+			break
+	if(allkeys):
+		result2 = k
+		if __debug__: print("Aunt {}: MATCH FOUND!".format(k))
+
 print("Part1 answer: {}".format(result1))
+print("Part2 answer: {}".format(result2))
 
 r"""
 --- Day 16: Aunt Sue ---
@@ -70,4 +95,12 @@ perfumes: 1
 You make a list of the things you can remember about each Aunt Sue. Things missing from your list aren't zero - you simply don't remember the value.
 
 What is the number of the Sue that got you the gift?
+
+--- Part Two ---
+
+As you're about to send the thank you note, something in the MFCSAM's instructions catches your eye. Apparently, it has an outdated retroencabulator, and so the output from the machine isn't exact values - some of them indicate ranges.
+
+In particular, the cats and trees readings indicates that there are greater than that many (due to the unpredictable nuclear decay of cat dander and tree pollen), while the pomeranians and goldfish readings indicate that there are fewer than that many (due to the modial interaction of magnetoreluctance).
+
+What is the number of the real Aunt Sue?
 """
