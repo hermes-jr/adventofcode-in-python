@@ -2,6 +2,12 @@
 """ Works like a f%@$^ng WOPR! Awesome =) """
 import random
 
+"""
+Correct answers for this set are: 1269 and 1309
+Sometimes gives incorrect answers, pretty quick though.
+Number of cycles may be increased to be sure.
+"""
+CYCLES = 20000
 HERO = {'hp': 50, 'dmg': 0, 'mana': 500, 'arm': 0}
 BOSS={'hp': 58, 'dmg': 9}
 
@@ -43,7 +49,7 @@ def getspell(manaleft, active_effects):
 			return spell
 	return None
 
-def battle(hardmode = False):
+def battle(hardmode = False, minspent = -1):
 	hero = HERO.copy()
 	boss = BOSS.copy()
 	active_effects = {'Shield': 0, 'Poison': 0, 'Recharge': 0}
@@ -82,9 +88,9 @@ def battle(hardmode = False):
 			if __debug__: print("Recharge provides {} mana; its timer is now {}.".format(eff, active_effects['Recharge']))
 
 		if(turn % 2 == 0):
-			if __debug__: print("\n-- Player turn --\nHero: {}\nBoss: {}".format(hero, boss))
 			""" Hero strikes """
-			""" At each player's turn there is a reason to cast a spell that results lesser 'minspent', flee otherwise """
+			if __debug__: print("\n-- Player turn --\nHero: {}\nBoss: {}".format(hero, boss))
+
 			spell = getspell(hero['mana'], active_effects)
 			if(spell == None or hero['mana'] < 0):
 				if __debug__: print("Can't afford any more spells. Flee")
@@ -112,14 +118,9 @@ def battle(hardmode = False):
 				if __debug__: print("Hero wins :)")
 				return {'victory': True, 'mana': manaspent}
 
-			"""
-			if(manaspent > minspent and minspent != -1):
-				if __debug__: print("No reason to fight any more, could be done better.")
-				return{'victory': False, 'mana': manaspent}
-			"""
 		else:
-			if __debug__: print("\n-- Boss turn --\nHero: {}\nBoss: {}".format(hero, boss))
 			""" Boss' turn """
+			if __debug__: print("\n-- Boss turn --\nHero: {}\nBoss: {}".format(hero, boss))
 			eff = clampdmg(boss['dmg'] - hero['arm'])
 			hero['hp'] -= eff
 			if __debug__: print("Boss deals {} damage; the hero goes down to {} hit points.".format(eff, hero['hp']))
@@ -130,8 +131,8 @@ def battle(hardmode = False):
 def play(hardcore = False):
 	modes = ('easy', 'hardcore')
 	minspent = -1
-	for attempt in range(50000):
-		result = battle(hardcore)
+	for attempt in range(CYCLES * (1 + hardcore)):
+		result = battle(hardcore, minspent)
 		if(result['victory'] and (result['mana'] < minspent or minspent == -1)):
 			minspent = result['mana']
 	print("In {} mode the lowest mana to win is: {}".format(modes[hardcore], minspent))
