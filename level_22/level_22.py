@@ -43,13 +43,18 @@ def getspell(manaleft, active_effects):
 			return spell
 	return None
 
-def battle():
+def battle(hardmode = False):
 	hero = HERO.copy()
 	boss = BOSS.copy()
 	active_effects = {'Shield': 0, 'Poison': 0, 'Recharge': 0}
 	manaspent = 0
 	
 	for turn in range(1000):
+		if(hardmode and turn % 2 == 0):
+			hero['hp'] -= 1
+			if __debug__: print("Due to hardcore mode player bleeds for 1 HP")
+			if(hero['hp'] <= 0): return {'victory': False, 'mana': manaspent}
+
 		""" Effects strike """
 		if __debug__: print("Active effects: {}".format(active_effects))
 		if(active_effects['Shield'] > 0):
@@ -122,14 +127,17 @@ def battle():
 				if __debug__: print("Boss wins :(")
 				return {'victory': False, 'mana': manaspent}
 
+def play(hardcore = False):
+	modes = ('easy', 'hardcore')
+	minspent = -1
+	for attempt in range(50000):
+		result = battle(hardcore)
+		if(result['victory'] and (result['mana'] < minspent or minspent == -1)):
+			minspent = result['mana']
+	print("In {} mode the lowest mana to win is: {}".format(modes[hardcore], minspent))
 
-minspent = -1
-for attempt in range(50000):
-	result = battle()
-	if(result['victory'] and (result['mana'] < minspent or minspent == -1)):
-		minspent = result['mana']
-
-print minspent
+play(False)
+play(True)
 
 r"""
 --- Day 22: Wizard Simulator 20XX ---
@@ -242,4 +250,12 @@ Player casts Magic Missile, dealing 4 damage.
 Poison deals 3 damage. This kills the boss, and the player wins.
 
 You start with 50 hit points and 500 mana points. The boss's actual stats are in your puzzle input. What is the least amount of mana you can spend and still win the fight? (Do not include mana recharge effects as "spending" negative mana.)
+
+--- Part Two ---
+
+On the next run through the game, you increase the difficulty to hard.
+
+At the start of each player turn (before any other effects apply), you lose 1 hit point. If this brings you to or below 0 hit points, you lose.
+
+With the same starting stats for you and the boss, what is the least amount of mana you can spend and still win the fight?
 """
