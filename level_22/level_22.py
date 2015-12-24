@@ -35,7 +35,7 @@ def getspell(manaleft, active_effects):
 	""" Attempt to return something unexpected first """
 	for attempt in range(len(SPELLS) * 3):
 		spell = random.choice(SPELLS)
-		if(spell['mana'] <= manaleft and spell['name'] not in (k for k, v in active_effects.iteritems() if v > 0) ):
+		if(spell['mana'] < manaleft and spell['name'] not in (k for k, v in active_effects.iteritems() if v > 0) ):
 			return spell
 	""" In case random missed many times, full scan: """
 	for spell in SPELLS:
@@ -49,7 +49,7 @@ def battle():
 	active_effects = {'Shield': 0, 'Poison': 0, 'Recharge': 0}
 	manaspent = 0
 	
-	for turn in range(10000):
+	for turn in range(1000):
 		""" Effects strike """
 		if __debug__: print("Active effects: {}".format(active_effects))
 		if(active_effects['Shield'] > 0):
@@ -124,9 +124,9 @@ def battle():
 
 
 minspent = -1
-for attempt in range(1000000):
+for attempt in range(50000):
 	result = battle()
-	if((result['victory'] and result['mana'] < minspent) or minspent == -1):
+	if(result['victory'] and (result['mana'] < minspent or minspent == -1)):
 		minspent = result['mana']
 
 print minspent
