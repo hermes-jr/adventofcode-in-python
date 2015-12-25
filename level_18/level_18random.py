@@ -10,6 +10,7 @@ lights = [[0 for x in range(WIDTH)] for x in range(HEIGHT)]
 
 dark = '\x1b[32;40m#\x1b[0m'
 bright = '\x1b[32;1m#\x1b[0m'
+nocolor = '#'
 
 random.seed()
 for i in range(HEIGHT):
@@ -52,7 +53,7 @@ def animate():
 	for i in range(HEIGHT):
 		line = ''
 		for j in range(WIDTH):
-			if(nextgen[i][j] == 1): line += dark
+			if(nextgen[i][j] == 1): line += nocolor
 			else: line += '.'
 		print("{0:3d}: {1}".format(i + 1, line))
 
